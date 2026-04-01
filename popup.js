@@ -167,6 +167,18 @@ providerMenu.addEventListener('keydown', (e) => {
 });
 
 function init() {
+  const versionElement = document.getElementById('extension-version');
+  if (versionElement && chrome.runtime && chrome.runtime.getManifest) {
+    versionElement.textContent = 'v' + chrome.runtime.getManifest().version;
+  }
+
+  const reloadBtn = document.getElementById('reload-btn');
+  if (reloadBtn) {
+    reloadBtn.addEventListener('click', () => {
+      chrome.runtime.reload();
+    });
+  }
+
   chrome.storage.sync.get(DEFAULTS, (settings) => {
     applyTheme(settings.theme);
 

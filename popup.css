@@ -271,6 +271,42 @@ body {
   margin-left: 8px;
 }
 
+/* ---------------------------------------------------------------------------
+   Settings Footer
+   --------------------------------------------------------------------------- */
+.settings-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.version-text {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.reload-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: inherit;
+  opacity: 0.5;
+}
+
+.reload-btn:hover {
+  opacity: 1;
+  background-color: rgba(128, 128, 128, 0.1);
+}
+
 /* ==========================================================================
    Light Theme
    ========================================================================== */
@@ -361,6 +397,7 @@ body[data-theme="system"] {
   font-weight: 500;
 }
 
+
 /* ==========================================================================
    Dark Theme
    ========================================================================== */
@@ -435,6 +472,7 @@ body[data-theme="dark"] {
   font-weight: 500;
 }
 
+
 /* ==========================================================================
    System Theme — Media Query Override
    ========================================================================== */
@@ -503,4 +541,5 @@ body[data-theme="dark"] {
     color: #eff6ff;
     font-weight: 500;
   }
+
 }
