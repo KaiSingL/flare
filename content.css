@@ -1,0 +1,207 @@
+#grok-popup-button {
+  display: flex;
+  position: absolute;
+  padding: 8px 16px;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  white-space: nowrap;
+  align-items: center;
+  background-color: #fcfcfc;
+  color: #000;
+  border: 1px solid #e5e7eb;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+#grok-popup-button.hidden {
+  display: none;
+}
+
+#grok-popup-button svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  #grok-popup-button {
+    background-color: #151515;
+    color: #fff;
+    border-color: #374151;
+  }
+}
+
+#grok-card-popup {
+  display: block;
+  position: absolute;
+  background-color: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  z-index: 50;
+  max-width: 448px;
+  width: 320px;
+  transform: translateX(-50%);
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+#grok-card-popup.hidden {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  #grok-card-popup {
+    background-color: #151515;
+    border-color: #374151;
+  }
+}
+
+.grok-quote {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grok-quote {
+    background-color: #374151;
+  }
+}
+
+#grok-selected-quote {
+  font-style: italic;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #grok-selected-quote {
+    color: #d1d5db;
+  }
+}
+
+.grok-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+#grok-prompt-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  #grok-prompt-input {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: white;
+  }
+}
+
+.grok-submit-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grok-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grok-checkbox {
+    color: #d1d5db;
+  }
+}
+
+.grok-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+}
+
+.grok-checkbox input[type="checkbox"]:checked {
+  background-color: #1e1d1dff;
+  border: none;
+}
+
+.grok-checkbox input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: #1e1d1dff;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .grok-checkbox input[type="checkbox"] {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+
+  .grok-checkbox input[type="checkbox"]:checked {
+    background-color: #fff;
+    border: none;
+  }
+
+  .grok-checkbox input[type="checkbox"]:checked::after {
+    background-color: #fff;
+  }
+}
+
+#grok-submit-button {
+  background-color: #151515;
+  border: none;
+  border-radius: 9999px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  font-size: 14px;
+}
+
+#grok-submit-button:hover {
+  background-color: #1f2937;
+}
+
+#grok-submit-button svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
