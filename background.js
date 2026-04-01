@@ -1,5 +1,14 @@
+// Provider configuration
+const PROVIDERS = {
+  grok: { name: 'Grok', url: 'https://grok.com/' },
+  perplexity: { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
+  chatgpt: { name: 'ChatGPT', url: 'https://chatgpt.com/' },
+  claude: { name: 'Claude', url: 'https://claude.ai/' },
+  gemini: { name: 'Gemini', url: 'https://gemini.google.com/' }
+};
+
 // Debug logging utility
-const debug = false;
+let debug = false;
 function debugLog(...args) {
   if (debug) {
     console.log('[Quick Grok Debug]', ...args);
@@ -10,19 +19,22 @@ function debugLog(...args) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'askGrok') {
     debugLog('Background: Received query:', message.query.substring(0, 50) + '...');
-    openGrokTabWithQuery(message.query);
+    openTabWithQuery(message.query);
   }
   sendResponse({ status: 'received' });
   return true; // Keep message channel open for async response
 });
 
-// Open new Grok tab with pre-filled query via URL parameter
-function openGrokTabWithQuery(fullText) {
-  const encodedQuery = encodeURIComponent(fullText);
-  const grokUrl = `https://grok.com/?q=${encodedQuery}`;
-  
-  // Create new active tab with the query URL
-  chrome.tabs.create({ url: grokUrl, active: true }, (newTab) => {
-    debugLog('Background: Created new active tab with query:', newTab.id);
+// Open new tab with pre-filled query via URL parameter, using selected provider
+function openTabWithQuery(fullText) {
+  chrome.storage.sync.get({ provider: 'grok' }, (settings) => {
+    const provider = PROVIDERS[settings.provider] || PROVIDERS.grok;
+    const encodedQuery = encodeURIComponent(fullText);
+    const url = `${provider.url}?q=${encodedQuery}`;
+    
+    // Create new active tab with the query URL
+    chrome.tabs.create({ url, active: true }, (newTab) => {
+      debugLog('Background: Created new active tab for', provider.name, 'query:', newTab.id);
+    });
   });
 }

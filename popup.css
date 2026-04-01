@@ -1,0 +1,506 @@
+/* ==========================================================================
+   Settings Popup Styles
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Entrance Animation
+   --------------------------------------------------------------------------- */
+@keyframes popup-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   System Font Stack
+   --------------------------------------------------------------------------- */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* ---------------------------------------------------------------------------
+   Popup Body
+   --------------------------------------------------------------------------- */
+body {
+  width: 280px;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation: popup-enter 0.2s ease-out;
+  transition: background-color 0.3s ease, color 0.25s ease, box-shadow 0.3s ease;
+}
+
+/* ---------------------------------------------------------------------------
+   Settings Container
+   --------------------------------------------------------------------------- */
+.settings-container {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---------------------------------------------------------------------------
+   Settings Section
+   --------------------------------------------------------------------------- */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------------------
+   Section Labels
+   --------------------------------------------------------------------------- */
+.settings-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Theme Segmented Control
+   --------------------------------------------------------------------------- */
+.theme-segmented-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 8px;
+  padding: 3px;
+  height: 34px;
+  transition: background-color 0.25s ease;
+}
+
+.theme-option-btn {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  outline: none;
+  transition: color 0.18s ease;
+}
+
+.theme-option-btn:focus-visible {
+  box-shadow: 0 0 0 2px;
+}
+
+.theme-option-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Active indicator dot */
+.theme-option-btn::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.theme-option-btn[aria-pressed="true"]::after {
+  opacity: 1;
+}
+
+/* Sliding knob */
+.theme-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 3);
+  height: 28px;
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: left 0.22s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease, box-shadow 0.25s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Provider Dropdown
+   --------------------------------------------------------------------------- */
+.provider-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.provider-trigger {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px 0 10px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+  background: transparent;
+  color: inherit;
+}
+
+.provider-trigger-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.provider-trigger-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.provider-trigger-label {
+  flex: 1;
+  text-align: left;
+  margin-left: 8px;
+}
+
+.provider-trigger-arrow {
+  width: 12px;
+  height: 12px;
+  opacity: 0.4;
+  transition: transform 0.2s ease, opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.provider-trigger:hover .provider-trigger-arrow {
+  opacity: 0.7;
+}
+
+.provider-trigger[aria-expanded="true"] .provider-trigger-arrow {
+  transform: rotate(180deg);
+}
+
+.provider-menu {
+  margin-top: 4px;
+  border-radius: 8px;
+  border: 1px solid;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  display: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.provider-menu.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.provider-option {
+  width: 100%;
+  height: 34px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  transition: background-color 0.15s ease;
+  outline: none;
+}
+
+.provider-option-icon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.provider-option-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.provider-option-label {
+  flex: 1;
+  margin-left: 8px;
+}
+
+/* ==========================================================================
+   Light Theme
+   ========================================================================== */
+[data-theme="light"],
+[data-theme="system"] {
+  background-color: #fff;
+  color: #111;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .settings-label,
+[data-theme="system"] .settings-label {
+  color: #6b7280;
+}
+
+/* Segmented control track */
+[data-theme="light"] .theme-segmented-control,
+[data-theme="system"] .theme-segmented-control {
+  background-color: #f3f4f4;
+}
+
+/* Knob */
+[data-theme="light"] .theme-knob,
+[data-theme="system"] .theme-knob {
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Inactive option buttons */
+[data-theme="light"] .theme-option-btn[aria-pressed="false"],
+[data-theme="system"] .theme-option-btn[aria-pressed="false"] {
+  color: #9ca3af;
+}
+
+[data-theme="light"] .theme-option-btn[aria-pressed="false"]:hover,
+[data-theme="system"] .theme-option-btn[aria-pressed="false"]:hover {
+  color: #6b7280;
+}
+
+/* Active option button */
+[data-theme="light"] .theme-option-btn[aria-pressed="true"],
+[data-theme="system"] .theme-option-btn[aria-pressed="true"] {
+  color: #111;
+}
+
+/* Focus ring */
+[data-theme="light"] .theme-option-btn:focus-visible,
+[data-theme="system"] .theme-option-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Provider trigger & menu */
+[data-theme="light"] .provider-trigger,
+[data-theme="system"] .provider-trigger,
+[data-theme="light"] .provider-menu,
+[data-theme="system"] .provider-menu {
+  background-color: #fff;
+  border-color: #e5e7eb;
+}
+
+[data-theme="light"] .provider-trigger:hover,
+[data-theme="system"] .provider-trigger:hover {
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .provider-trigger:focus-visible,
+[data-theme="system"] .provider-trigger:focus-visible {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+[data-theme="light"] .provider-trigger-icon,
+[data-theme="system"] .provider-trigger-icon {
+  color: #6b7280;
+}
+
+[data-theme="light"] .provider-option:hover,
+[data-theme="system"] .provider-option:hover,
+[data-theme="light"] .provider-option:focus-visible,
+[data-theme="system"] .provider-option:focus-visible {
+  background-color: #f3f4f6;
+}
+
+[data-theme="light"] .provider-option[aria-selected="true"],
+[data-theme="system"] .provider-option[aria-selected="true"] {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Dark Theme
+   ========================================================================== */
+[data-theme="dark"] {
+  background-color: #1a1a1a;
+  color: #f3f4f6;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .settings-label {
+  color: #9ca3af;
+}
+
+/* Segmented control track */
+[data-theme="dark"] .theme-segmented-control {
+  background-color: #262626;
+}
+
+/* Knob */
+[data-theme="dark"] .theme-knob {
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Inactive option buttons */
+[data-theme="dark"] .theme-option-btn[aria-pressed="false"] {
+  color: #6b7280;
+}
+
+[data-theme="dark"] .theme-option-btn[aria-pressed="false"]:hover {
+  color: #d1d5db;
+}
+
+/* Active option button */
+[data-theme="dark"] .theme-option-btn[aria-pressed="true"] {
+  color: #111;
+}
+
+/* Focus ring */
+[data-theme="dark"] .theme-option-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+}
+
+/* Provider trigger & menu */
+[data-theme="dark"] .provider-trigger,
+[data-theme="dark"] .provider-menu {
+  background-color: #262626;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .provider-trigger:hover {
+  border-color: #4b5563;
+}
+
+[data-theme="dark"] .provider-trigger:focus-visible {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+}
+
+[data-theme="dark"] .provider-trigger-icon {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .provider-option:hover,
+[data-theme="dark"] .provider-option:focus-visible {
+  background-color: #374151;
+}
+
+[data-theme="dark"] .provider-option[aria-selected="true"] {
+  background-color: #1e3a8a;
+  color: #eff6ff;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   System Theme — Media Query Override
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    background-color: #1a1a1a;
+    color: #e5e5e5;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  [data-theme="system"] .settings-label {
+    color: #9ca3af;
+  }
+
+  [data-theme="system"] .theme-segmented-control {
+    background-color: #262626;
+  }
+
+  [data-theme="system"] .theme-knob {
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme="system"] .theme-option-btn[aria-pressed="false"] {
+    color: #6b7280;
+  }
+
+  [data-theme="system"] .theme-option-btn[aria-pressed="false"]:hover {
+    color: #d1d5db;
+  }
+
+  [data-theme="system"] .theme-option-btn[aria-pressed="true"] {
+    color: #111;
+  }
+
+  [data-theme="system"] .theme-option-btn:focus-visible {
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+  }
+
+  [data-theme="system"] .provider-trigger,
+  [data-theme="system"] .provider-menu {
+    background-color: #262626;
+    border-color: #374151;
+  }
+
+  [data-theme="system"] .provider-trigger:hover {
+    border-color: #4b5563;
+  }
+
+  [data-theme="system"] .provider-trigger:focus-visible {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+  }
+
+  [data-theme="system"] .provider-trigger-icon {
+    color: #9ca3af;
+  }
+
+  [data-theme="system"] .provider-option:hover,
+  [data-theme="system"] .provider-option:focus-visible {
+    background-color: #374151;
+  }
+
+  [data-theme="system"] .provider-option[aria-selected="true"] {
+    background-color: #1e3a8a;
+    color: #eff6ff;
+    font-weight: 500;
+  }
+}
