@@ -12,7 +12,10 @@
   color: #000 !important;
   border: 1px solid #e5e7eb !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
-  font-size: 16px !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
 #grok-popup-button.hidden {
@@ -27,12 +30,10 @@
   flex-shrink: 0 !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  #grok-popup-button {
-    background-color: #151515 !important;
-    color: #fff !important;
-    border-color: #374151 !important;
-  }
+#grok-popup-button[data-grok-theme="dark"] {
+  background-color: #151515 !important;
+  color: #fff !important;
+  border-color: #374151 !important;
 }
 
 #grok-card-popup {
@@ -48,18 +49,19 @@
   width: 320px !important;
   transform: translateX(-50%) !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
 #grok-card-popup.hidden {
   display: none !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  #grok-card-popup {
-    background-color: #151515 !important;
-    border-color: #374151 !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] {
+  background-color: #151515 !important;
+  border-color: #374151 !important;
 }
 
 .grok-quote {
@@ -69,29 +71,25 @@
   border-radius: 6px !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .grok-quote {
-    background-color: #374151 !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] .grok-quote {
+  background-color: #374151 !important;
 }
 
 #grok-selected-quote {
   font-style: italic !important;
   color: #4b5563 !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  #grok-selected-quote {
-    color: #d1d5db !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] #grok-selected-quote {
+  color: #d1d5db !important;
 }
 
 .grok-input-container {
   display: flex !important;
   flex-direction: column !important;
   gap: 8px !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 #grok-prompt-input {
@@ -107,12 +105,10 @@
   background-color: #fff !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  #grok-prompt-input {
-    background-color: #374151 !important;
-    border-color: #4b5563 !important;
-    color: white !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] #grok-prompt-input {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: white !important;
 }
 
 .grok-submit-container {
@@ -125,15 +121,16 @@
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
-  font-size: 14px !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
   cursor: pointer !important;
   color: #4b5563 !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .grok-checkbox {
-    color: #d1d5db !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] .grok-checkbox {
+  color: #d1d5db !important;
 }
 
 .grok-checkbox input[type="checkbox"] {
@@ -165,20 +162,18 @@
   transform: translate(-50%, -50%) !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .grok-checkbox input[type="checkbox"] {
-    background-color: #374151 !important;
-    border-color: #4b5563 !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] .grok-checkbox input[type="checkbox"] {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+}
 
-  .grok-checkbox input[type="checkbox"]:checked {
-    background-color: #fff !important;
-    border: none !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] .grok-checkbox input[type="checkbox"]:checked {
+  background-color: #fff !important;
+  border: none !important;
+}
 
-  .grok-checkbox input[type="checkbox"]:checked::after {
-    background-color: #fff !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] .grok-checkbox input[type="checkbox"]:checked::after {
+  background-color: #fff !important;
 }
 
 #grok-submit-button {
@@ -193,7 +188,7 @@
   padding: 4px !important;
   cursor: pointer !important;
   transition: background-color 0.15s ease, transform 0.1s ease !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 #grok-submit-button:hover {
@@ -211,16 +206,14 @@
   transition: color 0.15s ease !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  #grok-submit-button {
-    background-color: #262626 !important;
-  }
-  
-  #grok-submit-button:hover {
-    background-color: #3f3f46 !important;
-  }
-  
-  #grok-submit-button svg {
-    color: #e5e5e5 !important;
-  }
+#grok-card-popup[data-grok-theme="dark"] #grok-submit-button {
+  background-color: #262626 !important;
+}
+
+#grok-card-popup[data-grok-theme="dark"] #grok-submit-button:hover {
+  background-color: #3f3f46 !important;
+}
+
+#grok-card-popup[data-grok-theme="dark"] #grok-submit-button svg {
+  color: #e5e5e5 !important;
 }

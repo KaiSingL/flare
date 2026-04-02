@@ -295,17 +295,46 @@ if (submitButton) {
   debugLog('Submit button not found in DOM!');
 }
 
-// Set initial submit button icon
-chrome.storage.sync.get({ provider: 'grok' }, (settings) => {
-  if (submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[settings.provider]) {
-    submitButton.innerHTML = PROVIDERS_DATA[settings.provider].icon;
+// Set initial settings
+let currentThemeSetting = 'system';
+
+function updateTheme() {
+  let isDark = false;
+  if (currentThemeSetting === 'dark') {
+    isDark = true;
+  } else if (currentThemeSetting === 'light') {
+    isDark = false;
+  } else {
+    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  
+  const themeAttr = isDark ? 'dark' : 'light';
+  if (popupButton) popupButton.setAttribute('data-grok-theme', themeAttr);
+  if (cardPopup) cardPopup.setAttribute('data-grok-theme', themeAttr);
+}
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (currentThemeSetting === 'system') {
+    updateTheme();
   }
 });
 
-// Listen for provider changes to update the submit button icon
+chrome.storage.sync.get({ provider: 'grok', theme: 'system' }, (settings) => {
+  if (submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[settings.provider]) {
+    submitButton.innerHTML = PROVIDERS_DATA[settings.provider].icon;
+  }
+  currentThemeSetting = settings.theme;
+  updateTheme();
+});
+
+// Listen for settings changes
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.provider && submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[changes.provider.newValue]) {
     submitButton.innerHTML = PROVIDERS_DATA[changes.provider.newValue].icon;
+  }
+  if (changes.theme) {
+    currentThemeSetting = changes.theme.newValue;
+    updateTheme();
   }
 });
 
