@@ -1,23 +1,26 @@
-# Quick Grok Browser Extension
+# Flare Browser Extension
 
-A Chrome browser extension that lets you select text on any webpage and quickly ask Grok about it with an optional prompt.
+A Chrome browser extension that lets you select text on any webpage and quickly ask your favorite AI provider about it with an optional prompt.
 
 ## Features
 
 - **Text Selection**: Select any text on any webpage
-- **Quick Access**: Click the "Ask Grok" button that appears above your selection
-- **Context Enhancement**: Add additional context or questions in the popup
-- **Automatic Integration**: Opens Grok.com and automatically injects your query
-- **Clean UI**: Modern, responsive interface that works on all websites
-- **Dark Mode Support**: Automatically adapts to your system theme
+- **Quick Access**: Click the "Ask" button that appears above your selection
+- **Multi-Provider Support**: Choose between Grok, Perplexity, ChatGPT, Claude, and Gemini
+- **Context Enhancement**: Add additional context, questions, and optionally include the current page URL
+- **Clean UI**: Modern, responsive interface with tactile feedback that works on all websites
+- **Dynamic Theme Switching**: Choose between Light, Dark, or System themes
+- **Local Settings**: Remembers your preferred AI provider and theme using Chrome Storage
 
 ## How to Use
 
-1. **Select Text**: Highlight any text on a webpage
-2. **Click "Ask Grok"**: A button will appear above your selection
-3. **Add Context** (Optional): Use the popup to add more context or specific questions
-4. **Submit**: Click the submit button or press Enter to send to Grok
-5. **View Result**: A new Grok tab will open with your query ready to be answered
+1. **Select Provider & Theme**: Click the extension icon in your toolbar to open the settings popup. Choose your preferred AI provider and theme.
+2. **Select Text**: Highlight any text on a webpage.
+3. **Click "Ask"**: A small button with the Flare icon will appear above your selection.
+4. **Add Context** (Optional): Use the popup card to type a question or add more context.
+5. **Include URL** (Optional): Check the "Include URL" box to pass the current page's link to the AI.
+6. **Submit**: Click the submit button (with your provider's icon) or press Enter.
+7. **View Result**: A new tab will open for your chosen AI provider with your query pre-filled and ready to go.
 
 ## Installation
 
@@ -25,7 +28,7 @@ A Chrome browser extension that lets you select text on any webpage and quickly 
 
 1. **Download the Extension**
    - Download all extension files to a local directory
-   - Ensure you have all required files: `manifest.json`, `background.js`, `content.js`, and icon files
+   - Ensure you have all required files: `manifest.json`, `background.js`, `content.js`, `content.css`, `popup.*`, `providers.js`, and the `icons/` folder.
 
 2. **Open Chrome Extensions**
    - Navigate to `chrome://extensions/` in your Chrome browser
@@ -37,46 +40,46 @@ A Chrome browser extension that lets you select text on any webpage and quickly 
 4. **Load the Extension**
    - Click "Load unpacked"
    - Select the directory containing the extension files
-   - The "Quick Grok" extension should now appear in your extensions list
+   - The "Flare" extension should now appear in your extensions list
 
 5. **Pin the Extension** (Optional)
    - Click the extensions puzzle piece icon in your Chrome toolbar
-   - Pin "Quick Grok" for easy access
+   - Pin "Flare" for easy access to settings
 
 ## Technical Details
 
 ### Architecture
 
 - **Manifest V3**: Uses the latest Chrome extension manifest format
-- **Service Worker**: Background script handles tab management and injection
-- **Content Script**: Injects UI elements and handles user interactions
-- **Content Scripts**: Runs on all websites with proper permissions
+- **Service Worker (`background.js`)**: Handles tab creation and URL parameter generation
+- **Content Scripts (`content.js`, `content.css`)**: Injects UI elements (button and popup card) and handles on-page interactions
+- **Popup (`popup.html/js/css`)**: Provides the extension menu for selecting themes and AI providers
+- **Shared Config (`providers.js`)**: Centralized configuration for AI provider URLs and SVG icons
 
 ### Permissions
 
-The extension requires the following permissions:
+The extension requires the minimum necessary permissions:
 
-- `tabs`: To create new tabs and interact with them
-- `scripting`: To inject scripts into the Grok website
-- `host_permissions`: `https://grok.com/*` to access and interact with Grok
+- `tabs`: To create new tabs and open the AI provider URLs
+- `storage`: To save and retrieve your provider and theme preferences
 
 ## Development
 
 ### Local Development
 
 1. **Make Changes**: Edit the source files as needed
-2. **Reload Extension**: Go to `chrome://extensions/` and click the refresh icon for "Quick Grok"
+2. **Reload Extension**: Go to `chrome://extensions/` and click the refresh icon for "Flare", or use the reload button in the extension popup.
 3. **Test**: Visit a webpage and test the extension functionality
 
 ### Build Process
 
-This extension requires no build process - it's a pure JavaScript extension using modern web standards.
+This extension requires no build process - it's a pure JavaScript/CSS/HTML extension using modern web standards.
 
 ### Debugging
 
-- **Extension Errors**: Check `chrome://extensions/` → "Quick Grok" → "Details" → "Inspect views: service worker"
-- **Content Script**: Right-click on any webpage → "Inspect" → Console tab
-- **Background Script**: Check the service worker console for error messages
+- **Extension Errors**: Check `chrome://extensions/` → "Flare" → "Details" → "Inspect views: service worker"
+- **Content Script**: Right-click on any webpage → "Inspect" → Console tab (Set `const debug = true;` in `content.js` for verbose logs)
+- **Background Script**: Check the service worker console for error messages (Set `let debug = true;` in `background.js`)
 
 ## Browser Compatibility
 
@@ -89,25 +92,25 @@ This extension requires no build process - it's a pure JavaScript extension usin
 ## Privacy & Security
 
 - **No Data Collection**: The extension does not collect, store, or transmit any personal data
-- **Local Operation**: All processing happens locally in your browser
-- **Secure Permissions**: Only requests minimum necessary permissions
-- **No External Servers**: All communication is directly with grok.com
+- **Local Storage**: Preferences are stored locally in your browser using Chrome Sync
+- **Secure Permissions**: Only requests the minimum necessary permissions (`tabs` and `storage`)
+- **Direct Navigation**: Opens your chosen AI provider directly via URL parameters without intercepting or man-in-the-middle data
 
 ## Troubleshooting
 
 ### Button Not Appearing
 - Ensure text is actually selected (highlighted)
+- Ensure the selected text is not inside an editable field (like a text input)
 - Try refreshing the webpage
 - Check that the extension is enabled in `chrome://extensions/`
 
-### Text Not Injecting
-- Ensure you're logged into grok.com
-- Check if grok.com has changed their interface (the extension targets common selectors)
-- Try manually reloading the extension
+### Query Not Passing to Provider
+- Check if you are logged into the AI provider's website
+- Ensure your browser hasn't blocked the new tab from opening
 
 ### Extension Not Working
 - Check the extension's background script console for errors
 - Ensure all required files are present
-- Try reloading the extension in developer mode
+- Try clicking the reload button in the extension popup or in `chrome://extensions/`
 
 
