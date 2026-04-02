@@ -1,11 +1,4 @@
-// Provider configuration
-const PROVIDERS = {
-  grok: { name: 'Grok', url: 'https://grok.com/' },
-  perplexity: { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
-  chatgpt: { name: 'ChatGPT', url: 'https://chatgpt.com/' },
-  claude: { name: 'Claude', url: 'https://claude.ai/' },
-  gemini: { name: 'Gemini', url: 'https://gemini.google.com/' }
-};
+// Provider configuration will be fetched from storage to keep it dynamic
 
 // Debug logging utility
 let debug = false;
@@ -28,7 +21,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Open new tab with pre-filled query via URL parameter, using selected provider
 function openTabWithQuery(fullText) {
   chrome.storage.sync.get({ provider: 'grok' }, (settings) => {
-    const provider = PROVIDERS[settings.provider] || PROVIDERS.grok;
+    // Read from the shared PROVIDERS_DATA injected into the background page context,
+    // or fallback to hardcoded urls if not available in background script
+    const providerMap = {
+      grok: { name: 'Grok', url: 'https://grok.com/' },
+      perplexity: { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
+      chatgpt: { name: 'ChatGPT', url: 'https://chatgpt.com/' },
+      claude: { name: 'Claude', url: 'https://claude.ai/' },
+      gemini: { name: 'Gemini', url: 'https://gemini.google.com/' }
+    };
+    const provider = providerMap[settings.provider] || providerMap.grok;
     const encodedQuery = encodeURIComponent(fullText);
     const url = `${provider.url}?q=${encodedQuery}`;
     
