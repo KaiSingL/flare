@@ -31,7 +31,9 @@ function applyTheme(theme) {
 function renderProviderMenu(currentProvider) {
   providerMenu.innerHTML = '';
   
-  Object.keys(PROVIDERS_DATA).forEach((key) => {
+  Object.keys(PROVIDERS_DATA)
+    .filter(key => !PROVIDERS_DATA[key].disabled)
+    .forEach((key) => {
     const provider = PROVIDERS_DATA[key];
     const isSelected = key === currentProvider;
     
