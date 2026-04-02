@@ -182,7 +182,7 @@
 }
 
 #grok-submit-button {
-  background-color: #151515 !important;
+  background-color: #f3f4f6 !important;
   border: none !important;
   border-radius: 9999px !important;
   width: 40px !important;
@@ -192,16 +192,35 @@
   justify-content: center !important;
   padding: 4px !important;
   cursor: pointer !important;
-  transition: background-color 0.15s ease !important;
+  transition: background-color 0.15s ease, transform 0.1s ease !important;
   font-size: 14px !important;
 }
 
 #grok-submit-button:hover {
-  background-color: #1f2937 !important;
+  background-color: #e5e7eb !important;
+}
+
+#grok-submit-button:active {
+  transform: scale(0.96) !important;
 }
 
 #grok-submit-button svg {
   width: 20px !important;
   height: 20px !important;
-  color: white !important;
+  color: #374151 !important;
+  transition: color 0.15s ease !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  #grok-submit-button {
+    background-color: #262626 !important;
+  }
+  
+  #grok-submit-button:hover {
+    background-color: #3f3f46 !important;
+  }
+  
+  #grok-submit-button svg {
+    color: #e5e5e5 !important;
+  }
 }
