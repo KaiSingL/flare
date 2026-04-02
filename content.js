@@ -12,7 +12,7 @@ popupButton.id = 'grok-popup-button';
 const iconUrl = chrome.runtime.getURL('icons/icon.svg');
 popupButton.innerHTML = `
   <img src="${iconUrl}" width="24" height="24" alt="Flare">
-  Ask
+  <span class="grok-popup-label">Ask</span>
 `;
 document.body.appendChild(popupButton);
 popupButton.classList.add('hidden'); // Ensure initial hidden state

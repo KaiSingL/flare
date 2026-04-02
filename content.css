@@ -1,13 +1,18 @@
 #grok-popup-button {
   display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
   position: absolute !important;
-  padding: 8px 16px !important;
+  padding: 8px !important;
   border-radius: 6px !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
   transform: translate(-50%, -50%) !important;
   z-index: 50 !important;
   white-space: nowrap !important;
   align-items: center !important;
+  justify-content: center !important;
+  min-height: 44px !important;
+  min-width: 44px !important;
   background-color: #fcfcfc !important;
   color: #000 !important;
   border: 1px solid #e5e7eb !important;
@@ -25,9 +30,17 @@
 #grok-popup-button img {
   width: 16px !important;
   height: 16px !important;
-  margin-right: 8px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
   display: inline-block !important;
   flex-shrink: 0 !important;
+}
+
+.grok-popup-label {
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
 }
 
 #grok-popup-button[data-grok-theme="dark"] {
@@ -103,6 +116,13 @@
   font-family: inherit !important;
   font-size: inherit !important;
   background-color: #fff !important;
+}
+
+#grok-prompt-input::placeholder {
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
 }
 
 #grok-card-popup[data-grok-theme="dark"] #grok-prompt-input {
