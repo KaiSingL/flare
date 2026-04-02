@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Flare",
-  "version": "0.3",
+  "version": "0.4",
   "description": "Select text on any webpage and quickly ask Grok about it with an optional prompt.",
   "permissions": ["tabs", "storage"],
   "action": {
