@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Flare",
+  "name": "Flare: Ask AI & Web Copilot",
   "version": "0.4",
-  "description": "Select text on any webpage and quickly ask Grok about it with an optional prompt.",
+  "description": "Highlight text on any website to instantly ask AI. Summarize, translate, explain, or rewrite content using custom prompts.",
   "permissions": ["tabs", "storage"],
   "action": {
     "default_popup": "popup.html"
