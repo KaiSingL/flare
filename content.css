@@ -158,42 +158,27 @@
   width: 16px !important;
   height: 16px !important;
   border-radius: 50% !important;
-  border: 2px solid #d1d5db !important;
+  border: 1.5px solid #d1d5db !important;
   background-color: #fff !important;
   cursor: pointer !important;
   position: relative !important;
   outline: none !important;
+  transition: all 0.2s ease !important;
 }
 
 .grok-checkbox input[type="checkbox"]:checked {
-  background-color: #1e1d1dff !important;
-  border: none !important;
-}
-
-.grok-checkbox input[type="checkbox"]:checked::after {
-  content: '' !important;
-  position: absolute !important;
-  width: 8px !important;
-  height: 8px !important;
-  background-color: #1e1d1dff !important;
-  border-radius: 50% !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
+  background-color: #111 !important;
+  border-color: #111 !important;
 }
 
 #grok-card-popup[data-grok-theme="dark"] .grok-checkbox input[type="checkbox"] {
-  background-color: #374151 !important;
-  border-color: #4b5563 !important;
+  background-color: #3f3f46 !important;
+  border-color: #52525b !important;
 }
 
 #grok-card-popup[data-grok-theme="dark"] .grok-checkbox input[type="checkbox"]:checked {
-  background-color: #fff !important;
-  border: none !important;
-}
-
-#grok-card-popup[data-grok-theme="dark"] .grok-checkbox input[type="checkbox"]:checked::after {
-  background-color: #fff !important;
+  background-color: #e5e5e5 !important;
+  border-color: #e5e5e5 !important;
 }
 
 #grok-submit-button {

@@ -209,7 +209,7 @@ function handleButtonClick() {
   popupButton.classList.add('hidden');
   window.getSelection().removeAllRanges();
   promptInput.value = '';
-  includeUrlCheckbox.checked = false; // Uncheck by default
+  includeUrlCheckbox.checked = includeUrlDefaultSetting; // Use setting
   promptInput.focus();
   debugLog('Card popup shown');
 }
@@ -297,6 +297,7 @@ if (submitButton) {
 
 // Set initial settings
 let currentThemeSetting = 'system';
+let includeUrlDefaultSetting = false;
 
 function updateTheme() {
   let isDark = false;
@@ -319,11 +320,12 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
   }
 });
 
-chrome.storage.sync.get({ provider: 'grok', theme: 'system' }, (settings) => {
+chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: false }, (settings) => {
   if (submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[settings.provider]) {
     submitButton.innerHTML = PROVIDERS_DATA[settings.provider].icon;
   }
   currentThemeSetting = settings.theme;
+  includeUrlDefaultSetting = settings.includeUrlDefault;
   updateTheme();
 });
 
@@ -335,6 +337,12 @@ chrome.storage.onChanged.addListener((changes) => {
   if (changes.theme) {
     currentThemeSetting = changes.theme.newValue;
     updateTheme();
+  }
+  if (changes.includeUrlDefault) {
+    includeUrlDefaultSetting = changes.includeUrlDefault.newValue;
+    if (includeUrlCheckbox) {
+      includeUrlCheckbox.checked = includeUrlDefaultSetting;
+    }
   }
 });
 

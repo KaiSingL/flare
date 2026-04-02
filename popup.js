@@ -1,7 +1,10 @@
-const DEFAULTS = { theme: 'system', provider: 'grok' };
+const DEFAULTS = { theme: 'system', provider: 'grok', includeUrlDefault: false };
 
 const knob = document.querySelector('.theme-knob');
 const control = document.querySelector('.theme-segmented-control');
+
+// Context Settings Elements
+const includeUrlDefaultCheckbox = document.getElementById('include-url-default');
 
 // Provider Dropdown Elements
 const providerTrigger = document.getElementById('provider-trigger');
@@ -153,6 +156,10 @@ function init() {
     const currentProvider = settings.provider || 'grok';
     updateProviderTrigger(currentProvider);
     renderProviderMenu(currentProvider);
+
+    if (includeUrlDefaultCheckbox) {
+      includeUrlDefaultCheckbox.checked = settings.includeUrlDefault;
+    }
   });
 }
 
@@ -170,6 +177,12 @@ document.querySelectorAll('.theme-option-btn').forEach((btn) => {
   });
 });
 
+if (includeUrlDefaultCheckbox) {
+  includeUrlDefaultCheckbox.addEventListener('change', (e) => {
+    chrome.storage.sync.set({ includeUrlDefault: e.target.checked });
+  });
+}
+
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.theme) {
     applyTheme(changes.theme.newValue);
@@ -183,6 +196,9 @@ chrome.storage.onChanged.addListener((changes) => {
     document.querySelectorAll('.provider-option').forEach(btn => {
       btn.setAttribute('aria-selected', String(btn.dataset.provider === newProvider));
     });
+  }
+  if (changes.includeUrlDefault && includeUrlDefaultCheckbox) {
+    includeUrlDefaultCheckbox.checked = changes.includeUrlDefault.newValue;
   }
 });
 

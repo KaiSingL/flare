@@ -272,6 +272,89 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
+   Toggle Switch
+   --------------------------------------------------------------------------- */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 34px;
+}
+
+.setting-item-label {
+  font-size: 13px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(16px);
+}
+
+.toggle-switch input:focus-visible + .toggle-slider {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Light Theme Toggle */
+[data-theme="light"] .toggle-slider,
+[data-theme="system"] .toggle-slider {
+  background-color: #e5e7eb;
+}
+
+[data-theme="light"] .toggle-switch input:checked + .toggle-slider,
+[data-theme="system"] .toggle-switch input:checked + .toggle-slider {
+  background-color: #111;
+}
+
+/* Dark Theme Toggle */
+[data-theme="dark"] .toggle-slider {
+  background-color: #3f3f46;
+}
+
+[data-theme="dark"] .toggle-switch input:checked + .toggle-slider {
+  background-color: #f3f4f6;
+}
+
+[data-theme="dark"] .toggle-switch input:checked + .toggle-slider:before {
+  background-color: #1a1a1a;
+}
+
+/* ---------------------------------------------------------------------------
    Settings Footer
    --------------------------------------------------------------------------- */
 .settings-footer {
@@ -540,6 +623,19 @@ body[data-theme="dark"] {
     background-color: #1e3a8a;
     color: #eff6ff;
     font-weight: 500;
+  }
+
+  /* System Theme Toggle */
+  body[data-theme="system"] .toggle-slider {
+    background-color: #3f3f46;
+  }
+  
+  body[data-theme="system"] .toggle-switch input:checked + .toggle-slider {
+    background-color: #f3f4f6;
+  }
+  
+  body[data-theme="system"] .toggle-switch input:checked + .toggle-slider:before {
+    background-color: #1a1a1a;
   }
 
 }
