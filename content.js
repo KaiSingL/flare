@@ -349,6 +349,7 @@ chrome.storage.onChanged.addListener((changes) => {
 // Enter key to submit in textarea (without Shift)
 if (promptInput) {
   promptInput.addEventListener('keydown', (e) => {
+    e.stopPropagation();
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
