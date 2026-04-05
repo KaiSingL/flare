@@ -292,9 +292,11 @@ document.addEventListener('mousedown', (e) => {
   }
 });
 
-// Scroll: hide
+// Scroll: hide collapsed pill only
 document.addEventListener('scroll', () => {
-  hideWidget();
+  if (isCollapsed()) {
+    grokWidget.classList.add('hidden');
+  }
 });
 
 // Click outside widget: hide
