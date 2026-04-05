@@ -199,8 +199,8 @@
 }
 
 #grok-submit-button {
-  background-color: #f3f4f6 !important;
-  border: none !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
   border-radius: 9999px !important;
   width: 40px !important;
   height: 40px !important;
@@ -209,12 +209,12 @@
   justify-content: center !important;
   padding: 4px !important;
   cursor: pointer !important;
-  transition: background-color 0.15s ease, transform 0.1s ease !important;
+  transition: background-color 0.2s ease, transform 0.1s ease !important;
   font-size: 13px !important;
 }
 
 #grok-submit-button:hover {
-  background-color: #e5e7eb !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 #grok-submit-button:active {
@@ -225,15 +225,16 @@
   width: 20px !important;
   height: 20px !important;
   color: #374151 !important;
-  transition: color 0.15s ease !important;
+  transition: color 0.2s ease !important;
 }
 
 #grok-card-popup[data-grok-theme="dark"] #grok-submit-button {
-  background-color: #262626 !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 #grok-card-popup[data-grok-theme="dark"] #grok-submit-button:hover {
-  background-color: #3f3f46 !important;
+  background-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 #grok-card-popup[data-grok-theme="dark"] #grok-submit-button svg {
