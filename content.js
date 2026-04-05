@@ -29,6 +29,10 @@ cardPopup.innerHTML = `
     <div class="grok-submit-container">
       <label class="grok-checkbox">
         <input type="checkbox" id="include-url">
+        <svg class="grok-url-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path class="grok-check-mark" d="m9 12 2 2 4-4"/>
+        </svg>
         Include URL
       </label>
       <button id="grok-submit-button">
