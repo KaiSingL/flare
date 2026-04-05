@@ -6,49 +6,48 @@ function debugLog(...args) {
   }
 }
 
-// Create and append popup button
-const popupButton = document.createElement('button');
-popupButton.id = 'grok-popup-button';
+// Create unified widget (replaces both popupButton and cardPopup)
 const iconUrl = chrome.runtime.getURL('icons/icon.svg');
-popupButton.innerHTML = `
-  <img src="${iconUrl}" width="24" height="24" alt="Flare">
-  <span class="grok-popup-label">Ask</span>
-`;
-document.body.appendChild(popupButton);
-popupButton.classList.add('hidden'); // Ensure initial hidden state
-
-// Create and append card popup
-const cardPopup = document.createElement('div');
-cardPopup.id = 'grok-card-popup';
-cardPopup.innerHTML = `
-  <div class="grok-quote">
-    <p id="grok-selected-quote" class="grok-quote-text"></p>
+const grokWidget = document.createElement('div');
+grokWidget.id = 'grok-widget';
+grokWidget.innerHTML = `
+  <div class="grok-widget-header">
+    <img src="${iconUrl}" width="24" height="24" alt="Flare">
+    <span class="grok-popup-label">Ask</span>
   </div>
-  <div class="grok-input-container">
-    <textarea id="grok-prompt-input" rows="3" placeholder="Add more context or a question..."></textarea>
-    <div class="grok-submit-container">
-      <label class="grok-checkbox">
-        <input type="checkbox" id="include-url">
-        <svg class="grok-url-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path class="grok-check-mark" d="m9 12 2 2 4-4"/>
-        </svg>
-        Include URL
-      </label>
-      <button id="grok-submit-button">
-        <!-- SVG injected dynamically -->
-      </button>
+  <div class="grok-widget-body-wrapper">
+    <div class="grok-widget-body">
+      <div class="grok-quote">
+        <p id="grok-selected-quote" class="grok-quote-text"></p>
+      </div>
+      <div class="grok-input-container">
+        <textarea id="grok-prompt-input" rows="3" placeholder="Add more context or a question..."></textarea>
+        <div class="grok-submit-container">
+          <label class="grok-checkbox">
+            <input type="checkbox" id="include-url">
+            <svg class="grok-url-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path class="grok-check-mark" d="m9 12 2 2 4-4"/>
+            </svg>
+            Include URL
+          </label>
+          <button id="grok-submit-button">
+            <!-- SVG injected dynamically -->
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 `;
-cardPopup.classList.add('hidden');
-document.body.appendChild(cardPopup);
+document.body.appendChild(grokWidget);
+grokWidget.classList.add('hidden');
 
 // Get elements
 const selectedQuote = document.getElementById('grok-selected-quote');
 const promptInput = document.getElementById('grok-prompt-input');
 const submitButton = document.getElementById('grok-submit-button');
 const includeUrlCheckbox = document.getElementById('include-url');
+const widgetHeader = grokWidget.querySelector('.grok-widget-header');
 
 // Robust function to check if the current selection is within an editable element
 function isSelectionInEditable() {
@@ -60,7 +59,6 @@ function isSelectionInEditable() {
   const range = selection.getRangeAt(0);
   let container = range.commonAncestorContainer;
 
-  // If container is a text node, move to its parent element
   if (container.nodeType !== Node.ELEMENT_NODE) {
     container = container.parentElement;
   }
@@ -69,8 +67,6 @@ function isSelectionInEditable() {
     return false;
   }
 
-  // Traverse up the DOM tree from the common ancestor container
-  // Check each element for editability (contenteditable or input/textarea)
   while (container && container !== document.body) {
     if (
       container.isContentEditable ||
@@ -85,68 +81,80 @@ function isSelectionInEditable() {
   return false;
 }
 
-// Position button at bottom center of selection
+// Check if widget is in collapsed (pill) state
+function isCollapsed() {
+  return !grokWidget.classList.contains('expanded');
+}
+
+// Hide widget entirely
+function hideWidget() {
+  grokWidget.classList.remove('expanded');
+  grokWidget.classList.add('hidden');
+}
+
+// Position widget at bottom center of selection (collapsed pill mode)
 function positionButton() {
   debugLog('Mouseup event fired');
-  // PLAN: Grab selection IMMEDIATELY—no setTimeout delay to beat React/event collapses
+  // Don't reposition if expanded
+  if (!isCollapsed()) return;
+
   const selection = window.getSelection();
   const selectedText = selection.toString().trim();
   debugLog('Immediate selection:', selectedText);
 
-  // PLAN: Primary check on selectedText truthiness, with fallbacks
   if (!selectedText || selection.rangeCount === 0 || selection.isCollapsed) {
     debugLog('No valid selection (immediate check)');
-    popupButton.classList.add('hidden');
+    grokWidget.classList.add('hidden');
+    grokWidget.classList.remove('expanded');
     return;
   }
 
   debugLog('Valid selection detected:', selectedText);
 
-  // Check if selection is in an editable element using robust method
   if (isSelectionInEditable()) {
-    debugLog('Selection in editable element, hiding button');
-    popupButton.classList.add('hidden');
+    debugLog('Selection in editable element, hiding widget');
+    grokWidget.classList.add('hidden');
     return;
   }
 
-  // PLAN: Store text in dataset immediately for handleButtonClick fallback
-  popupButton.dataset.selection = selectedText;
+  grokWidget.dataset.selection = selectedText;
 
-  // PLAN: Wrap range access in try-catch to avoid crashes on empty/invalid rects
   let rect;
   try {
     const range = selection.getRangeAt(0);
     rect = range.getBoundingClientRect();
   } catch (e) {
     debugLog('Range rect error:', e);
-    popupButton.classList.add('hidden');
+    grokWidget.classList.add('hidden');
     return;
   }
 
-  popupButton.style.left = (rect.left + 55) + 'px';
-  popupButton.style.top = (rect.bottom + window.scrollY + 30) + 'px';
-  popupButton.style.position = 'absolute';
-  popupButton.classList.remove('hidden');
+  // Position the pill: centered below the selection
+  grokWidget.style.left = (rect.left + 55) + 'px';
+  grokWidget.style.top = (rect.bottom + window.scrollY + 30) + 'px';
+  grokWidget.style.position = 'absolute';
+  grokWidget.style.transform = 'translate(-50%, -50%)';
+  grokWidget.classList.remove('hidden');
+  grokWidget.classList.remove('expanded');
 
-  // PLAN: Bulletproof visibility—zero-delay setTimeout to enforce display
   setTimeout(() => {
-    popupButton.classList.remove('hidden');
-    const computedStyle = window.getComputedStyle(popupButton);
+    grokWidget.classList.remove('hidden');
+    const computedStyle = window.getComputedStyle(grokWidget);
     if (computedStyle.display === 'none') {
-      popupButton.style.display = 'flex';
+      grokWidget.style.display = 'flex';
     }
     debugLog('Visibility enforced');
   }, 0);
 
-  debugLog('Popup button shown with stored selection:', selectedText);
+  debugLog('Widget shown (collapsed) with stored selection:', selectedText);
 }
 
-// Handle button click to show card
-function handleButtonClick() {
-  debugLog('Popup button clicked');
-  // PLAN: Use stored selection first (fallback to live if missing)
-  let selection = popupButton.dataset.selection || window.getSelection().toString().trim();
-  if (!selection) { 
+// Handle click on collapsed pill → expand into card
+function handleExpand() {
+  debugLog('Widget clicked for expand');
+  grokWidget.classList.remove('hidden');
+  let selection = grokWidget.dataset.selection || window.getSelection().toString().trim();
+  if (!selection) {
     debugLog('No selection available (stored or live)');
     return;
   }
@@ -154,71 +162,73 @@ function handleButtonClick() {
 
   // Store full quote for submission
   selectedQuote.dataset.fullQuote = selection;
-
-  // Truncate for display: max 80 chars + "..."
   const truncated = selection.length > 80 ? selection.substring(0, 80) + '...' : selection;
   selectedQuote.textContent = truncated;
 
-  const buttonRect = popupButton.getBoundingClientRect();
-  let popupTop = buttonRect.bottom + 8;
-  let popupLeft = buttonRect.left + buttonRect.width / 2;
+  // Capture current pill position BEFORE expanding
+  const pillRect = grokWidget.getBoundingClientRect();
+  const pillCenterX = pillRect.left + pillRect.width / 2;
+  // Remove the collapsed transform and set explicit positioning
+  grokWidget.style.transform = 'translateX(-50%)';
 
-  // ENHANCEMENT: Initial positioning (below button, centered)
-  cardPopup.style.left = popupLeft + 'px';
-  cardPopup.style.top = (popupTop + window.scrollY) + 'px';
-  cardPopup.style.position = 'absolute';
-  cardPopup.classList.remove('hidden');
+  // Switch to expanded — CSS transitions handle the morphing
+  grokWidget.classList.add('expanded');
 
-  // ENHANCEMENT: Zero-delay measure & adjust for viewport fit
+  // Position: expand downward from the pill position
+  // Use the pill's bottom edge as the top of the expanded card
+  const scrollTop = window.scrollY;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  let popupTop = pillRect.top + scrollTop; // Keep top at pill's top position
+  let popupLeft = pillCenterX;
+
+  grokWidget.style.left = popupLeft + 'px';
+  grokWidget.style.top = popupTop + 'px';
+
+  // After transition starts, adjust for viewport fit
   setTimeout(() => {
-    const popupRect = cardPopup.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const scrollY = window.scrollY;
+    const popupRect = grokWidget.getBoundingClientRect();
+    let adjustedTop = popupTop;
+    let adjustedLeft = popupLeft;
 
-    // Vertical adjustment: Prefer below; flip above if overflows bottom, nudge if top
-    let adjustedTop = popupTop + scrollY;
+    // Vertical: flip above if overflows bottom
     if (popupRect.bottom > viewportHeight) {
-      // Flip above if space allows (with buffer)
-      const spaceAbove = buttonRect.top - popupRect.height - 8;
+      const spaceAbove = pillRect.top - popupRect.height - 8;
       if (spaceAbove > 0) {
-        adjustedTop = (buttonRect.top - popupRect.height - 8) + scrollY;
-        debugLog('Flipped popup above button');
+        adjustedTop = (pillRect.top - popupRect.height - 8) + scrollTop;
       } else {
-        // Nudge up to fit bottom
-        adjustedTop = (viewportHeight - popupRect.height) + scrollY;
-        debugLog('Nudged popup up to fit viewport');
+        adjustedTop = (viewportHeight - popupRect.height) + scrollTop;
       }
     } else if (popupRect.top < 0) {
-      // Nudge down if overflows top (rare, but safe)
-      adjustedTop = scrollY + 8;
+      adjustedTop = scrollTop + 8;
     }
 
-    // Horizontal adjustment: Center-clamp to fit (respects translateX(-50%))
-    let adjustedLeft = popupLeft;
+    // Horizontal: clamp to fit
     const halfWidth = popupRect.width / 2;
     if (popupRect.left < 0) {
-      adjustedLeft = halfWidth + 8; // Shift right, small buffer
+      adjustedLeft = halfWidth + 8;
     } else if (popupRect.right > viewportWidth) {
-      adjustedLeft = (viewportWidth - halfWidth) - 8; // Shift left
+      adjustedLeft = (viewportWidth - halfWidth) - 8;
     }
 
-    // Apply adjustments
-    cardPopup.style.top = adjustedTop + 'px';
-    cardPopup.style.left = adjustedLeft + 'px';
-
-    debugLog('Viewport adjustments applied:', { adjustedTop, adjustedLeft });
+    grokWidget.style.top = adjustedTop + 'px';
+    grokWidget.style.left = adjustedLeft + 'px';
   }, 0);
 
-  popupButton.classList.add('hidden');
   window.getSelection().removeAllRanges();
   promptInput.value = '';
-  includeUrlCheckbox.checked = includeUrlDefaultSetting; // Use setting
-  promptInput.focus();
-  debugLog('Card popup shown');
+  includeUrlCheckbox.checked = includeUrlDefaultSetting;
+
+  // Focus input after transition
+  setTimeout(() => {
+    promptInput.focus();
+  }, 300);
+
+  debugLog('Widget expanded');
 }
 
-// Handle submit: Send to background script for Grok tab injection
+// Handle submit: Send to background script
 function handleSubmit() {
   debugLog('handleSubmit called');
   const fullQuote = selectedQuote.dataset.fullQuote || selectedQuote.textContent.trim();
@@ -232,13 +242,11 @@ function handleSubmit() {
   debugLog('prompt:', prompt);
   debugLog('includeUrl:', includeUrl);
 
-  // Base query components
   const quoteBlock = `\`\`\`\n${fullQuote}\n\`\`\``;
   const optionalPrompt = prompt ? `\n\n${prompt}` : '';
 
   let fullText;
   if (includeUrl) {
-    // Get current page full URL for site: operator (hidden from UI)
     const siteUrl = window.location.href;
     const sitePrefix = `site: ${siteUrl}`;
     fullText = `${sitePrefix}\n\n${quoteBlock}${optionalPrompt}`;
@@ -247,7 +255,6 @@ function handleSubmit() {
   }
   debugLog('fullText to send:', fullText);
 
-  // Send to background
   chrome.runtime.sendMessage({ action: 'askGrok', query: fullText }, (response) => {
     if (chrome.runtime.lastError) {
       debugLog('Content: Error sending message:', chrome.runtime.lastError);
@@ -256,50 +263,67 @@ function handleSubmit() {
     }
   });
 
-  // Hide popup
-  cardPopup.classList.add('hidden');
+  // Collapse and hide
+  hideWidget();
 }
 
+// ==============================
 // Event listeners
-// PLAN: Early event listening—add { capture: true, passive: true } for pristine access without blocking
+// ==============================
+
+// Mouseup for selection detection
 document.addEventListener('mouseup', positionButton, { capture: true, passive: true });
 
-document.addEventListener('keydown', () => {
-  if (!popupButton.classList.contains('hidden')) {
-    popupButton.classList.add('hidden');
+// Keydown: hide collapsed pill on any key
+document.addEventListener('keydown', (e) => {
+  if (isCollapsed()) {
+    grokWidget.classList.add('hidden');
+  }
+  // Escape key: collapse expanded widget
+  if (e.key === 'Escape' && !isCollapsed()) {
+    hideWidget();
   }
 });
 
+// Mousedown outside widget: hide
 document.addEventListener('mousedown', (e) => {
-  if (!popupButton.contains(e.target) && !cardPopup.contains(e.target)) {
-    popupButton.classList.add('hidden');
-    cardPopup.classList.add('hidden');
+  if (!grokWidget.contains(e.target)) {
+    hideWidget();
   }
 });
 
+// Scroll: hide
 document.addEventListener('scroll', () => {
-  popupButton.classList.add('hidden');
+  hideWidget();
 });
 
+// Click outside widget: hide
 document.addEventListener('click', (e) => {
-  if (!popupButton.contains(e.target) && !cardPopup.contains(e.target)) {
-    popupButton.classList.add('hidden');
-    cardPopup.classList.add('hidden');
+  if (!grokWidget.contains(e.target)) {
+    hideWidget();
   }
 });
 
-// Button event listeners
-popupButton.addEventListener('click', handleButtonClick);
+// Click on widget (collapsed pill) → expand
+grokWidget.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (isCollapsed()) {
+    handleExpand();
+  }
+});
 
-// Attach submit listener with debug
+// Submit button
 if (submitButton) {
-  submitButton.addEventListener('click', handleSubmit);
+  submitButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleSubmit();
+  });
   debugLog('Submit button listener attached successfully');
 } else {
   debugLog('Submit button not found in DOM!');
 }
 
-// Set initial settings
+// Settings
 let currentThemeSetting = 'system';
 let includeUrlDefaultSetting = false;
 
@@ -312,10 +336,9 @@ function updateTheme() {
   } else {
     isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
-  
+
   const themeAttr = isDark ? 'dark' : 'light';
-  if (popupButton) popupButton.setAttribute('data-grok-theme', themeAttr);
-  if (cardPopup) cardPopup.setAttribute('data-grok-theme', themeAttr);
+  grokWidget.setAttribute('data-grok-theme', themeAttr);
 }
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
@@ -333,7 +356,6 @@ chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: 
   updateTheme();
 });
 
-// Listen for settings changes
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.provider && submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[changes.provider.newValue]) {
     submitButton.innerHTML = PROVIDERS_DATA[changes.provider.newValue].icon;
@@ -354,6 +376,10 @@ chrome.storage.onChanged.addListener((changes) => {
 if (promptInput) {
   promptInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
+    if (e.key === 'Escape') {
+      hideWidget();
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
