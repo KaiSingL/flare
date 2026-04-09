@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Flare: Ask AI & Web Copilot",
-  "version": "0.7",
+  "version": "0.8",
   "description": "Highlight text on any website to instantly ask AI. Summarize, translate, explain, or rewrite content using custom prompts.",
   "permissions": ["storage"],
   "action": {
