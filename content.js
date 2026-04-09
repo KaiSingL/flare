@@ -7,7 +7,8 @@ function debugLog(...args) {
 }
 
 // Create unified widget (replaces both popupButton and cardPopup)
-const iconUrl = chrome.runtime.getURL('icons/icon.svg');
+const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="none" viewBox="0 0 256 256"><path d="m16.23 158.4c-1.86-9.36-2.84-17.28-2.84-27.68 0-57.98 46.78-111.7 109.6-111.7 13.16 0 23.16 1.33 35.17 5.44 7.95 2.91 16.86 4.54 28.59 4.54 21.49 0 41.52-6 66.22-24.96l-66.78 66.29c-13.23 13.5-25.11 18.68-41.45 18.68-5.92 0-10.48-1.34-27.6-1.34-46.78 0-87.06 28.29-100.9 70.74z" fill="url(#paint0_linear_101_49831)"/><path d="m3 252 103.8-101.6c19.21-19.02 40.27-31.56 63.94-41.63 23.94-10.2 48.32-26.02 67.87-64.47-6.4 18.88-8.34 29.85-7.99 46.24 0.35 13.76 2.42 23.28 2.42 37.63 0 54.7-41.82 104.9-101.8 111.4 18.77-16.39 29.64-34.86 29.77-51.75 0.11-12.04-6.54-22.98-19.89-22.98-7.94 0-13.57 3.12-16.6 5.27l-121.5 81.89z" fill="url(#paint1_linear_101_49831)"/><defs><linearGradient id="paint0_linear_101_49831" x1="94.99" x2="145.2" y1="160" y2="6.72" gradientUnits="userSpaceOnUse"><stop stop-color="#FF420E" offset="0"/><stop stop-color="#FF8200" offset="1"/></linearGradient><linearGradient id="paint1_linear_101_49831" x1="120.8" x2="120.8" y1="253.2" y2="44.34" gradientUnits="userSpaceOnUse"><stop stop-color="#F60073" offset="0"/><stop stop-color="#FD4A3C" offset="1"/></linearGradient></defs></svg>`;
+const iconUrl = `data:image/svg+xml,${encodeURIComponent(iconSvg)}`;
 const grokWidget = document.createElement('div');
 grokWidget.id = 'grok-widget';
 grokWidget.innerHTML = `
