@@ -1,10 +1,11 @@
-const DEFAULTS = { theme: 'system', provider: 'grok', includeUrlDefault: false };
+const DEFAULTS = { theme: 'system', provider: 'grok', includeUrlDefault: false, enabled: true };
 
 const knob = document.querySelector('.theme-knob');
 const control = document.querySelector('.theme-segmented-control');
 
 // Context Settings Elements
 const includeUrlDefaultCheckbox = document.getElementById('include-url-default');
+const extensionEnabledCheckbox = document.getElementById('extension-enabled');
 
 // Provider Dropdown Elements
 const providerTrigger = document.getElementById('provider-trigger');
@@ -162,6 +163,10 @@ function init() {
     if (includeUrlDefaultCheckbox) {
       includeUrlDefaultCheckbox.checked = settings.includeUrlDefault;
     }
+
+    if (extensionEnabledCheckbox) {
+      extensionEnabledCheckbox.checked = settings.enabled !== false;
+    }
   });
 }
 
@@ -185,6 +190,12 @@ if (includeUrlDefaultCheckbox) {
   });
 }
 
+if (extensionEnabledCheckbox) {
+  extensionEnabledCheckbox.addEventListener('change', (e) => {
+    chrome.storage.sync.set({ enabled: e.target.checked });
+  });
+}
+
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.theme) {
     applyTheme(changes.theme.newValue);
@@ -201,6 +212,9 @@ chrome.storage.onChanged.addListener((changes) => {
   }
   if (changes.includeUrlDefault && includeUrlDefaultCheckbox) {
     includeUrlDefaultCheckbox.checked = changes.includeUrlDefault.newValue;
+  }
+  if (changes.enabled && extensionEnabledCheckbox) {
+    extensionEnabledCheckbox.checked = changes.enabled.newValue !== false;
   }
 });
 

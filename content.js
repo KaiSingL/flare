@@ -95,6 +95,7 @@ function hideWidget() {
 // Position widget at bottom center of selection (collapsed pill mode)
 function positionButton() {
   debugLog('Mouseup event fired');
+  if (!extensionEnabled) return;
   // Don't reposition if expanded
   if (!isCollapsed()) return;
 
@@ -152,6 +153,7 @@ function positionButton() {
 // Handle click on collapsed pill → expand into card
 function handleExpand() {
   debugLog('Widget clicked for expand');
+  if (!extensionEnabled) { hideWidget(); return; }
   grokWidget.classList.remove('hidden');
   let selection = grokWidget.dataset.selection || window.getSelection().toString().trim();
   if (!selection) {
@@ -292,6 +294,18 @@ document.addEventListener('mousedown', (e) => {
   }
 });
 
+// Re-read enabled state when tab becomes visible
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    chrome.storage.sync.get({ enabled: true }, (settings) => {
+      extensionEnabled = settings.enabled !== false;
+      if (!extensionEnabled) {
+        hideWidget();
+      }
+    });
+  }
+});
+
 // Scroll: hide collapsed pill only
 document.addEventListener('scroll', () => {
   if (isCollapsed()) {
@@ -309,6 +323,7 @@ document.addEventListener('click', (e) => {
 // Click on widget (collapsed pill) → expand
 grokWidget.addEventListener('click', (e) => {
   e.stopPropagation();
+  if (!extensionEnabled) { hideWidget(); return; }
   if (isCollapsed()) {
     handleExpand();
   }
@@ -328,6 +343,7 @@ if (submitButton) {
 // Settings
 let currentThemeSetting = 'system';
 let includeUrlDefaultSetting = false;
+let extensionEnabled = true;
 
 function updateTheme() {
   let isDark = false;
@@ -349,12 +365,13 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
   }
 });
 
-chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: false }, (settings) => {
+chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: false, enabled: true }, (settings) => {
   if (submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[settings.provider]) {
     submitButton.innerHTML = PROVIDERS_DATA[settings.provider].icon;
   }
   currentThemeSetting = settings.theme;
   includeUrlDefaultSetting = settings.includeUrlDefault;
+  extensionEnabled = settings.enabled !== false;
   updateTheme();
 });
 
@@ -370,6 +387,12 @@ chrome.storage.onChanged.addListener((changes) => {
     includeUrlDefaultSetting = changes.includeUrlDefault.newValue;
     if (includeUrlCheckbox) {
       includeUrlCheckbox.checked = includeUrlDefaultSetting;
+    }
+  }
+  if (changes.enabled) {
+    extensionEnabled = changes.enabled.newValue !== false;
+    if (!extensionEnabled) {
+      hideWidget();
     }
   }
 });
