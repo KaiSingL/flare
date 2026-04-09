@@ -296,14 +296,14 @@ function positionButton() {
   }
 
   // Position the pill: centered below the selection, clamped to viewport
-  const PILL_W = 82;
-  const PILL_H = 44;
-  const PILL_MARGIN = 8;
+  const PILL_W = 64;
+  const PILL_H = 32;
+  const PILL_MARGIN = 6;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  let pillLeft = rect.left + 55;
-  let pillTop = rect.bottom + window.scrollY + 30;
+  let pillLeft = rect.left + 40;
+  let pillTop = rect.bottom + window.scrollY + 16;
 
   // Clamp pill within viewport while accounting for translate(-50%, -50%)
   if (pillLeft - PILL_W / 2 < PILL_MARGIN) {
