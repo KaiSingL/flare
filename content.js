@@ -90,6 +90,170 @@ function isCollapsed() {
 function hideWidget() {
   grokWidget.classList.remove('expanded');
   grokWidget.classList.add('hidden');
+  grokWidget.style.transform = '';
+}
+
+const EXPANSION_MARGIN = 16;
+const EST_EXPANDED_WIDTH = 320;
+const EST_EXPANDED_HEIGHT = 380;
+
+function getExpansionType(pillRect) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const pillCenterX = pillRect.left + pillRect.width / 2;
+
+  const centerFits =
+    pillCenterX - EST_EXPANDED_WIDTH / 2 >= EXPANSION_MARGIN &&
+    pillCenterX + EST_EXPANDED_WIDTH / 2 <= vw - EXPANSION_MARGIN;
+
+  let horizontal;
+  if (centerFits) {
+    horizontal = 'center';
+  } else if (vw - pillRect.right >= pillRect.left) {
+    horizontal = 'left';
+  } else {
+    horizontal = 'right';
+  }
+
+  let vertical;
+  if (vh - pillRect.bottom >= EST_EXPANDED_HEIGHT + EXPANSION_MARGIN) {
+    vertical = 'down';
+  } else if (pillRect.top >= EST_EXPANDED_HEIGHT + EXPANSION_MARGIN) {
+    vertical = 'up';
+  } else {
+    vertical = (vh - pillRect.bottom >= pillRect.top) ? 'down' : 'up';
+  }
+
+  return { horizontal, vertical };
+}
+
+function getExpansionTransform(expansion) {
+  const tx = { center: '-50%', left: '0', right: '-100%' }[expansion.horizontal];
+  const ty = { down: '0', up: '-100%' }[expansion.vertical];
+  if (tx === '0' && ty === '0') return 'none';
+  if (tx === '0') return `translateY(${ty})`;
+  if (ty === '0') return `translateX(${tx})`;
+  return `translate(${tx}, ${ty})`;
+}
+
+function adjustForViewportAfterTransition() {
+  function adjust() {
+    const rect = grokWidget.getBoundingClientRect();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let left = parseFloat(grokWidget.style.left) || 0;
+    let top = parseFloat(grokWidget.style.top) || 0;
+    let changed = false;
+
+    let expansion;
+    try { expansion = JSON.parse(grokWidget.dataset.expansionType); } catch { expansion = { horizontal: 'center', vertical: 'down' }; }
+
+    // Horizontal clamping — adjust 'left' based on anchor type
+    if (rect.left < EXPANSION_MARGIN) {
+      if (expansion.horizontal === 'center') {
+        left = scrollX + EXPANSION_MARGIN + rect.width / 2;
+      } else if (expansion.horizontal === 'left') {
+        left = scrollX + EXPANSION_MARGIN;
+      } else {
+        left = scrollX + EXPANSION_MARGIN + rect.width;
+      }
+      changed = true;
+    } else if (rect.right > vw - EXPANSION_MARGIN) {
+      if (expansion.horizontal === 'center') {
+        left = scrollX + vw - EXPANSION_MARGIN - rect.width / 2;
+      } else if (expansion.horizontal === 'left') {
+        left = scrollX + vw - EXPANSION_MARGIN - rect.width;
+      } else {
+        left = scrollX + vw - EXPANSION_MARGIN;
+      }
+      changed = true;
+    }
+
+    // Vertical clamping — adjust 'top' based on anchor type
+    if (rect.top < EXPANSION_MARGIN) {
+      top = scrollY + EXPANSION_MARGIN;
+      changed = true;
+    } else if (rect.bottom > vh - EXPANSION_MARGIN) {
+      if (expansion.vertical === 'down') {
+        top = scrollY + vh - EXPANSION_MARGIN - rect.height;
+      } else {
+        top = scrollY + vh - EXPANSION_MARGIN;
+      }
+      changed = true;
+    }
+
+    if (changed) {
+      grokWidget.style.transition = 'none';
+      grokWidget.style.left = left + 'px';
+      grokWidget.style.top = top + 'px';
+      requestAnimationFrame(() => {
+        grokWidget.style.transition = '';
+      });
+    }
+  }
+
+  function onTransitionEnd(e) {
+    if (e.propertyName === 'width') {
+      grokWidget.removeEventListener('transitionend', onTransitionEnd);
+      adjust();
+    }
+  }
+
+  grokWidget.addEventListener('transitionend', onTransitionEnd);
+  setTimeout(adjust, 500);
+}
+
+function repositionInView() {
+  if (isCollapsed()) return;
+
+  const rect = grokWidget.getBoundingClientRect();
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let left = parseFloat(grokWidget.style.left) || 0;
+  let top = parseFloat(grokWidget.style.top) || 0;
+
+  let expansion;
+  try { expansion = JSON.parse(grokWidget.dataset.expansionType); } catch { expansion = { horizontal: 'center', vertical: 'down' }; }
+
+  if (rect.left < EXPANSION_MARGIN) {
+    if (expansion.horizontal === 'center') {
+      left = scrollX + EXPANSION_MARGIN + rect.width / 2;
+    } else if (expansion.horizontal === 'left') {
+      left = scrollX + EXPANSION_MARGIN;
+    } else {
+      left = scrollX + EXPANSION_MARGIN + rect.width;
+    }
+  } else if (rect.right > vw - EXPANSION_MARGIN) {
+    if (expansion.horizontal === 'center') {
+      left = scrollX + vw - EXPANSION_MARGIN - rect.width / 2;
+    } else if (expansion.horizontal === 'left') {
+      left = scrollX + vw - EXPANSION_MARGIN - rect.width;
+    } else {
+      left = scrollX + vw - EXPANSION_MARGIN;
+    }
+  }
+
+  if (rect.top < EXPANSION_MARGIN) {
+    top = scrollY + EXPANSION_MARGIN;
+  } else if (rect.bottom > vh - EXPANSION_MARGIN) {
+    if (expansion.vertical === 'down') {
+      top = scrollY + vh - EXPANSION_MARGIN - rect.height;
+    } else {
+      top = scrollY + vh - EXPANSION_MARGIN;
+    }
+  }
+
+  grokWidget.style.transition = 'none';
+  grokWidget.style.left = left + 'px';
+  grokWidget.style.top = top + 'px';
+  requestAnimationFrame(() => {
+    grokWidget.style.transition = '';
+  });
 }
 
 // Position widget at bottom center of selection (collapsed pill mode)
@@ -130,9 +294,30 @@ function positionButton() {
     return;
   }
 
-  // Position the pill: centered below the selection
-  grokWidget.style.left = (rect.left + 55) + 'px';
-  grokWidget.style.top = (rect.bottom + window.scrollY + 30) + 'px';
+  // Position the pill: centered below the selection, clamped to viewport
+  const PILL_W = 82;
+  const PILL_H = 44;
+  const PILL_MARGIN = 8;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let pillLeft = rect.left + 55;
+  let pillTop = rect.bottom + window.scrollY + 30;
+
+  // Clamp pill within viewport while accounting for translate(-50%, -50%)
+  if (pillLeft - PILL_W / 2 < PILL_MARGIN) {
+    pillLeft = PILL_MARGIN + PILL_W / 2;
+  } else if (pillLeft + PILL_W / 2 > vw - PILL_MARGIN) {
+    pillLeft = vw - PILL_MARGIN - PILL_W / 2;
+  }
+  if (pillTop - PILL_H / 2 < window.scrollY + PILL_MARGIN) {
+    pillTop = window.scrollY + PILL_MARGIN + PILL_H / 2;
+  } else if (pillTop + PILL_H / 2 > window.scrollY + vh - PILL_MARGIN) {
+    pillTop = window.scrollY + vh - PILL_MARGIN - PILL_H / 2;
+  }
+
+  grokWidget.style.left = pillLeft + 'px';
+  grokWidget.style.top = pillTop + 'px';
   grokWidget.style.position = 'absolute';
   grokWidget.style.transform = 'translate(-50%, -50%)';
   grokWidget.classList.remove('hidden');
@@ -169,54 +354,34 @@ function handleExpand() {
 
   // Capture current pill position BEFORE expanding
   const pillRect = grokWidget.getBoundingClientRect();
-  const pillCenterX = pillRect.left + pillRect.width / 2;
-  // Remove the collapsed transform and set explicit positioning
-  grokWidget.style.transform = 'translateX(-50%)';
+  const expansion = getExpansionType(pillRect);
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
 
-  // Switch to expanded — CSS transitions handle the morphing
+  // Document coordinates for the anchor point
+  let left, top;
+  if (expansion.horizontal === 'center') {
+    left = pillRect.left + pillRect.width / 2 + scrollX;
+  } else if (expansion.horizontal === 'left') {
+    left = pillRect.left + scrollX;
+  } else {
+    left = pillRect.right + scrollX;
+  }
+
+  if (expansion.vertical === 'down') {
+    top = pillRect.top + scrollY;
+  } else {
+    top = pillRect.bottom + scrollY;
+  }
+
+  grokWidget.style.left = left + 'px';
+  grokWidget.style.top = top + 'px';
+  grokWidget.style.transform = getExpansionTransform(expansion);
   grokWidget.classList.add('expanded');
 
-  // Position: expand downward from the pill position
-  // Use the pill's bottom edge as the top of the expanded card
-  const scrollTop = window.scrollY;
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+  grokWidget.dataset.expansionType = JSON.stringify(expansion);
 
-  let popupTop = pillRect.top + scrollTop; // Keep top at pill's top position
-  let popupLeft = pillCenterX;
-
-  grokWidget.style.left = popupLeft + 'px';
-  grokWidget.style.top = popupTop + 'px';
-
-  // After transition starts, adjust for viewport fit
-  setTimeout(() => {
-    const popupRect = grokWidget.getBoundingClientRect();
-    let adjustedTop = popupTop;
-    let adjustedLeft = popupLeft;
-
-    // Vertical: flip above if overflows bottom
-    if (popupRect.bottom > viewportHeight) {
-      const spaceAbove = pillRect.top - popupRect.height - 8;
-      if (spaceAbove > 0) {
-        adjustedTop = (pillRect.top - popupRect.height - 8) + scrollTop;
-      } else {
-        adjustedTop = (viewportHeight - popupRect.height) + scrollTop;
-      }
-    } else if (popupRect.top < 0) {
-      adjustedTop = scrollTop + 8;
-    }
-
-    // Horizontal: clamp to fit
-    const halfWidth = popupRect.width / 2;
-    if (popupRect.left < 0) {
-      adjustedLeft = halfWidth + 8;
-    } else if (popupRect.right > viewportWidth) {
-      adjustedLeft = (viewportWidth - halfWidth) - 8;
-    }
-
-    grokWidget.style.top = adjustedTop + 'px';
-    grokWidget.style.left = adjustedLeft + 'px';
-  }, 0);
+  adjustForViewportAfterTransition();
 
   window.getSelection().removeAllRanges();
   promptInput.value = '';
@@ -227,7 +392,7 @@ function handleExpand() {
     promptInput.focus();
   }, 300);
 
-  debugLog('Widget expanded');
+  debugLog('Widget expanded with type:', expansion);
 }
 
 // Handle submit: Send to background script
@@ -306,10 +471,19 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Scroll: hide collapsed pill only
+// Scroll: hide collapsed pill, reposition expanded card
 document.addEventListener('scroll', () => {
   if (isCollapsed()) {
     grokWidget.classList.add('hidden');
+  } else {
+    repositionInView();
+  }
+});
+
+// Resize: reposition expanded card to stay in viewport
+window.addEventListener('resize', () => {
+  if (!isCollapsed()) {
+    repositionInView();
   }
 });
 
