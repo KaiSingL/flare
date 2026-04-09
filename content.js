@@ -91,7 +91,7 @@ function isCollapsed() {
 function hideWidget() {
   grokWidget.classList.remove('expanded');
   grokWidget.classList.add('hidden');
-  grokWidget.style.transform = '';
+  grokWidget.style.removeProperty('transform');
 }
 
 const EXPANSION_MARGIN = 16;
@@ -186,11 +186,11 @@ function adjustForViewportAfterTransition() {
     }
 
     if (changed) {
-      grokWidget.style.transition = 'none';
-      grokWidget.style.left = left + 'px';
-      grokWidget.style.top = top + 'px';
+      grokWidget.style.setProperty('transition', 'none', 'important');
+      grokWidget.style.setProperty('left', left + 'px', 'important');
+      grokWidget.style.setProperty('top', top + 'px', 'important');
       requestAnimationFrame(() => {
-        grokWidget.style.transition = '';
+        grokWidget.style.removeProperty('transition');
       });
     }
   }
@@ -249,11 +249,11 @@ function repositionInView() {
     }
   }
 
-  grokWidget.style.transition = 'none';
-  grokWidget.style.left = left + 'px';
-  grokWidget.style.top = top + 'px';
+  grokWidget.style.setProperty('transition', 'none', 'important');
+  grokWidget.style.setProperty('left', left + 'px', 'important');
+  grokWidget.style.setProperty('top', top + 'px', 'important');
   requestAnimationFrame(() => {
-    grokWidget.style.transition = '';
+    grokWidget.style.removeProperty('transition');
   });
 }
 
@@ -317,10 +317,10 @@ function positionButton() {
     pillTop = window.scrollY + vh - PILL_MARGIN - PILL_H / 2;
   }
 
-  grokWidget.style.left = pillLeft + 'px';
-  grokWidget.style.top = pillTop + 'px';
-  grokWidget.style.position = 'absolute';
-  grokWidget.style.transform = 'translate(-50%, -50%)';
+  grokWidget.style.setProperty('left', pillLeft + 'px', 'important');
+  grokWidget.style.setProperty('top', pillTop + 'px', 'important');
+  grokWidget.style.setProperty('position', 'absolute', 'important');
+  grokWidget.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
   grokWidget.classList.remove('hidden');
   grokWidget.classList.remove('expanded');
 
@@ -328,7 +328,7 @@ function positionButton() {
     grokWidget.classList.remove('hidden');
     const computedStyle = window.getComputedStyle(grokWidget);
     if (computedStyle.display === 'none') {
-      grokWidget.style.display = 'flex';
+      grokWidget.style.setProperty('display', 'flex', 'important');
     }
     debugLog('Visibility enforced');
   }, 0);
@@ -375,9 +375,9 @@ function handleExpand() {
     top = pillRect.bottom + scrollY;
   }
 
-  grokWidget.style.left = left + 'px';
-  grokWidget.style.top = top + 'px';
-  grokWidget.style.transform = getExpansionTransform(expansion);
+  grokWidget.style.setProperty('left', left + 'px', 'important');
+  grokWidget.style.setProperty('top', top + 'px', 'important');
+  grokWidget.style.setProperty('transform', getExpansionTransform(expansion), 'important');
   grokWidget.classList.add('expanded');
 
   grokWidget.dataset.expansionType = JSON.stringify(expansion);
