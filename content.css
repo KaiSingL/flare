@@ -109,6 +109,13 @@
               box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
+#grok-widget:not(.expanded),
+#grok-widget:not(.expanded) *,
+#grok-widget:not(.expanded) *::before,
+#grok-widget:not(.expanded) *::after {
+  cursor: pointer !important;
+}
+
 #grok-widget.hidden {
   display: none !important;
 }
@@ -158,6 +165,7 @@
 
 .grok-popup-label {
   display: inline !important;
+  cursor: pointer !important;
   text-transform: uppercase !important;
   font-size: 9px !important;
   font-weight: 500 !important;
