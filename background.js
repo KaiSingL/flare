@@ -29,7 +29,7 @@ function openTabWithQuery(fullText) {
       : 'grok';
     const provider = PROVIDERS_DATA[providerKey];
     const encodedQuery = encodeURIComponent(fullText);
-    const url = `${provider.url}?q=${encodedQuery}`;
+    const url = `${provider.url}?q=${encodedQuery}${provider.params || ''}`;
     
     // Create new active tab with the query URL
     chrome.tabs.create({ url, active: true }, (newTab) => {
