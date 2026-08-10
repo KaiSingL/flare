@@ -450,37 +450,143 @@ function handleSubmit() {
 // Provider selection in widget
 // ==============================
 
+let currentProviderSetting = 'grok';
+let providerSwapInProgress = false;
+
+const BAR_ICON_SIZE = 16;
+const SUBMIT_ICON_SIZE = 20;
+
+function spawnFlyer(svg, startRect, endRect, startSize, endSize, color) {
+  const flyer = document.createElement('div');
+  flyer.className = 'grok-flying-icon';
+  flyer.innerHTML = svg;
+
+  const startX = startRect.left + startRect.width / 2 - endSize / 2;
+  const startY = startRect.top + startRect.height / 2 - endSize / 2;
+
+  flyer.style.setProperty('position', 'fixed', 'important');
+  flyer.style.setProperty('z-index', '2147483647', 'important');
+  flyer.style.setProperty('pointer-events', 'none', 'important');
+  flyer.style.setProperty('color', color, 'important');
+  flyer.style.setProperty('width', endSize + 'px', 'important');
+  flyer.style.setProperty('height', endSize + 'px', 'important');
+  flyer.style.setProperty('left', startX + 'px', 'important');
+  flyer.style.setProperty('top', startY + 'px', 'important');
+  flyer.style.setProperty('display', 'flex', 'important');
+  flyer.style.setProperty('align-items', 'center', 'important');
+  flyer.style.setProperty('justify-content', 'center', 'important');
+
+  const svgEl = flyer.querySelector('svg');
+  if (svgEl) {
+    svgEl.style.setProperty('width', endSize + 'px', 'important');
+    svgEl.style.setProperty('height', endSize + 'px', 'important');
+    svgEl.style.setProperty('display', 'block', 'important');
+  }
+
+  document.body.appendChild(flyer);
+
+  const dx = endRect.left + endRect.width / 2 - startRect.left - startRect.width / 2;
+  const dy = endRect.top + endRect.height / 2 - startRect.top - startRect.height / 2;
+
+  const anim = flyer.animate(
+    [
+      { transform: `translate(0, 0) scale(${startSize / endSize})` },
+      { transform: `translate(${dx}px, ${dy}px) scale(1)` }
+    ],
+    { duration: 360, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+  );
+
+  anim.finished
+    .then(() => { if (flyer.parentNode) flyer.parentNode.removeChild(flyer); })
+    .catch(() => { if (flyer.parentNode) flyer.parentNode.removeChild(flyer); });
+
+  return anim;
+}
+
 function renderProviderBar(container, currentProvider) {
   if (!container || typeof PROVIDERS_DATA === 'undefined') return;
   container.innerHTML = '';
 
   Object.keys(PROVIDERS_DATA)
-    .filter(key => !PROVIDERS_DATA[key].disabled)
+    .filter(key => !PROVIDERS_DATA[key].disabled && key !== currentProvider)
     .forEach((key) => {
       const btn = document.createElement('button');
       btn.className = 'grok-provider-btn';
       btn.type = 'button';
       btn.dataset.provider = key;
       btn.setAttribute('aria-label', PROVIDERS_DATA[key].name);
-      btn.setAttribute('aria-pressed', String(key === currentProvider));
       btn.setAttribute('title', PROVIDERS_DATA[key].name);
       btn.innerHTML = PROVIDERS_DATA[key].icon;
 
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        selectProviderInWidget(key);
+        selectProviderInWidget(key, btn);
       });
 
       container.appendChild(btn);
     });
 }
 
-function selectProviderInWidget(providerKey) {
+function selectProviderInWidget(providerKey, clickedBtn) {
   if (!PROVIDERS_DATA[providerKey]) return;
-  chrome.storage.sync.set({ provider: providerKey });
+  if (providerSwapInProgress) return;
+  if (providerKey === currentProviderSetting) return;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canAnimate = clickedBtn && submitButton && !reducedMotion && typeof clickedBtn.animate === 'function';
+
+  if (!canAnimate) {
+    providerSwapInProgress = true;
+    currentProviderSetting = providerKey;
+    chrome.storage.sync.set({ provider: providerKey });
+    renderProviderBar(providerBar, providerKey);
+    if (submitButton) {
+      submitButton.innerHTML = PROVIDERS_DATA[providerKey].icon;
+    }
+    providerSwapInProgress = false;
+    return;
+  }
+
+  providerSwapInProgress = true;
+
+  const fromRect = clickedBtn.getBoundingClientRect();
+  const toRect = submitButton.getBoundingClientRect();
+  const oldIcon = submitButton.innerHTML;
+  const newIcon = PROVIDERS_DATA[providerKey].icon;
+  const color = grokWidget.getAttribute('data-grok-theme') === 'dark' ? '#e5e5e5' : '#374151';
+
   renderProviderBar(providerBar, providerKey);
-  if (submitButton) {
-    submitButton.innerHTML = PROVIDERS_DATA[providerKey].icon;
+
+  submitButton.innerHTML = '';
+
+  const oldSlotBtn = providerBar.querySelector(`[data-provider="${currentProviderSetting}"]`);
+  const oldSlotRect = oldSlotBtn ? oldSlotBtn.getBoundingClientRect() : null;
+  if (oldSlotBtn) {
+    oldSlotBtn.style.setProperty('opacity', '0', 'important');
+  }
+
+  const flyIn = spawnFlyer(newIcon, fromRect, toRect, BAR_ICON_SIZE, SUBMIT_ICON_SIZE, color);
+  const flyBack = oldSlotRect
+    ? spawnFlyer(oldIcon, toRect, oldSlotRect, SUBMIT_ICON_SIZE, BAR_ICON_SIZE, color)
+    : null;
+
+  const animations = [flyIn.finished];
+  if (flyBack) animations.push(flyBack.finished);
+
+  Promise.all(animations)
+    .then(finishSwap)
+    .catch(finishSwap);
+
+  function finishSwap() {
+    if (submitButton) {
+      submitButton.innerHTML = newIcon;
+    }
+    if (oldSlotBtn) {
+      oldSlotBtn.style.removeProperty('opacity');
+    }
+    currentProviderSetting = providerKey;
+    chrome.storage.sync.set({ provider: providerKey });
+    providerSwapInProgress = false;
   }
 }
 
@@ -596,6 +702,7 @@ chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: 
   if (submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[settings.provider]) {
     submitButton.innerHTML = PROVIDERS_DATA[settings.provider].icon;
   }
+  currentProviderSetting = settings.provider;
   renderProviderBar(providerBar, settings.provider);
   currentThemeSetting = settings.theme;
   includeUrlDefaultSetting = settings.includeUrlDefault;
@@ -605,8 +712,11 @@ chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: 
 
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.provider && submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[changes.provider.newValue]) {
-    submitButton.innerHTML = PROVIDERS_DATA[changes.provider.newValue].icon;
-    renderProviderBar(providerBar, changes.provider.newValue);
+    if (!providerSwapInProgress) {
+      submitButton.innerHTML = PROVIDERS_DATA[changes.provider.newValue].icon;
+      renderProviderBar(providerBar, changes.provider.newValue);
+    }
+    currentProviderSetting = changes.provider.newValue;
   }
   if (changes.theme) {
     currentThemeSetting = changes.theme.newValue;

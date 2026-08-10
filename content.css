@@ -406,8 +406,6 @@
   max-width: 20px !important;
   max-height: 20px !important;
   color: #374151 !important;
-  fill: none !important;
-  stroke: currentColor !important;
   transition: color 0.2s ease !important;
 }
 
