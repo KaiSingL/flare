@@ -37,6 +37,16 @@ grokWidget.innerHTML = `
           </button>
         </div>
       </div>
+      <div class="grok-provider-switcher">
+        <svg class="grok-card-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+        <div class="grok-provider-bar-wrap">
+          <div class="grok-provider-bar-clip">
+            <div class="grok-provider-bar" id="grok-provider-bar"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 `;
@@ -49,6 +59,7 @@ const promptInput = document.getElementById('grok-prompt-input');
 const submitButton = document.getElementById('grok-submit-button');
 const includeUrlCheckbox = document.getElementById('include-url');
 const widgetHeader = grokWidget.querySelector('.grok-widget-header');
+const providerBar = document.getElementById('grok-provider-bar');
 
 // Robust function to check if the current selection is within an editable element
 function isSelectionInEditable() {
@@ -96,7 +107,7 @@ function hideWidget() {
 
 const EXPANSION_MARGIN = 16;
 const EST_EXPANDED_WIDTH = 320;
-const EST_EXPANDED_HEIGHT = 380;
+const EST_EXPANDED_HEIGHT = 430;
 
 function getExpansionType(pillRect) {
   const vw = window.innerWidth;
@@ -436,11 +447,52 @@ function handleSubmit() {
 }
 
 // ==============================
+// Provider selection in widget
+// ==============================
+
+function renderProviderBar(container, currentProvider) {
+  if (!container || typeof PROVIDERS_DATA === 'undefined') return;
+  container.innerHTML = '';
+
+  Object.keys(PROVIDERS_DATA)
+    .filter(key => !PROVIDERS_DATA[key].disabled)
+    .forEach((key) => {
+      const btn = document.createElement('button');
+      btn.className = 'grok-provider-btn';
+      btn.type = 'button';
+      btn.dataset.provider = key;
+      btn.setAttribute('aria-label', PROVIDERS_DATA[key].name);
+      btn.setAttribute('aria-pressed', String(key === currentProvider));
+      btn.setAttribute('title', PROVIDERS_DATA[key].name);
+      btn.innerHTML = PROVIDERS_DATA[key].icon;
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectProviderInWidget(key);
+      });
+
+      container.appendChild(btn);
+    });
+}
+
+function selectProviderInWidget(providerKey) {
+  if (!PROVIDERS_DATA[providerKey]) return;
+  chrome.storage.sync.set({ provider: providerKey });
+  renderProviderBar(providerBar, providerKey);
+  if (submitButton) {
+    submitButton.innerHTML = PROVIDERS_DATA[providerKey].icon;
+  }
+}
+
+// ==============================
 // Event listeners
 // ==============================
 
 // Mouseup for selection detection
-document.addEventListener('mouseup', positionButton, { capture: true, passive: true });
+document.addEventListener('mouseup', (e) => {
+  if (grokWidget.contains(e.target)) return;
+  positionButton();
+}, { capture: true, passive: true });
 
 // Keydown: hide collapsed pill on any key
 document.addEventListener('keydown', (e) => {
@@ -544,6 +596,7 @@ chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: 
   if (submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[settings.provider]) {
     submitButton.innerHTML = PROVIDERS_DATA[settings.provider].icon;
   }
+  renderProviderBar(providerBar, settings.provider);
   currentThemeSetting = settings.theme;
   includeUrlDefaultSetting = settings.includeUrlDefault;
   extensionEnabled = settings.enabled !== false;
@@ -553,6 +606,7 @@ chrome.storage.sync.get({ provider: 'grok', theme: 'system', includeUrlDefault: 
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.provider && submitButton && typeof PROVIDERS_DATA !== 'undefined' && PROVIDERS_DATA[changes.provider.newValue]) {
     submitButton.innerHTML = PROVIDERS_DATA[changes.provider.newValue].icon;
+    renderProviderBar(providerBar, changes.provider.newValue);
   }
   if (changes.theme) {
     currentThemeSetting = changes.theme.newValue;

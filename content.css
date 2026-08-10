@@ -423,3 +423,123 @@
 #grok-widget[data-grok-theme="dark"] #grok-submit-button svg {
   color: #e5e5e5 !important;
 }
+
+/* ==============================
+   Provider switcher (expanded card, bottom)
+   ============================== */
+.grok-provider-switcher {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-top: 10px !important;
+  cursor: pointer !important;
+}
+
+.grok-provider-bar-wrap {
+  display: grid !important;
+  grid-template-rows: 0fr !important;
+  transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  width: 100% !important;
+}
+
+.grok-provider-switcher:hover .grok-provider-bar-wrap {
+  grid-template-rows: 1fr !important;
+}
+
+.grok-provider-bar-clip {
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+
+.grok-card-chevron {
+  display: block !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: 6px !important;
+  margin-bottom: 6px !important;
+  color: #9ca3af !important;
+  opacity: 0.6 !important;
+  transition: opacity 0.15s ease, color 0.15s ease, transform 0.2s ease !important;
+}
+
+.grok-provider-switcher:hover .grok-card-chevron {
+  opacity: 1 !important;
+  color: #4b5563 !important;
+  transform: rotate(180deg) !important;
+}
+
+.grok-provider-bar {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-around !important;
+  align-items: center !important;
+  gap: 2px !important;
+  margin-top: 12px !important;
+  padding: 4px 8px !important;
+  border-radius: 9999px !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  width: 100% !important;
+}
+
+.grok-provider-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9999px !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: #6b7280 !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+}
+
+.grok-provider-btn svg {
+  display: block !important;
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+}
+
+.grok-provider-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+  color: #111 !important;
+}
+
+.grok-provider-btn[aria-pressed="true"] {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  color: #111 !important;
+}
+
+#grok-widget[data-grok-theme="dark"] .grok-provider-bar {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#grok-widget[data-grok-theme="dark"] .grok-card-chevron {
+  color: #71717a !important;
+}
+
+#grok-widget[data-grok-theme="dark"] .grok-provider-switcher:hover .grok-card-chevron {
+  color: #e5e5e5 !important;
+}
+
+#grok-widget[data-grok-theme="dark"] .grok-provider-btn {
+  color: #a1a1aa !important;
+}
+
+#grok-widget[data-grok-theme="dark"] .grok-provider-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e5e5e5 !important;
+}
+
+#grok-widget[data-grok-theme="dark"] .grok-provider-btn[aria-pressed="true"] {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
+}
